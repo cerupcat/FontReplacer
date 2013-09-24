@@ -29,12 +29,25 @@ static void initializeReplacementFonts()
 	Method fontWithName_size_ = class_getClassMethod([UIFont class], @selector(fontWithName:size:));
 	Method fontWithName_size_traits_ = class_getClassMethod([UIFont class], @selector(fontWithName:size:traits:));
 	Method replacementFontWithName_size_ = class_getClassMethod([UIFont class], @selector(replacement_fontWithName:size:));
-	Method replacementFontWithName_size_traits_ = class_getClassMethod([UIFont class], @selector(replacement_fontWithName:size:traits:));
-	
+		Method replacementFontWithName_size_traits_ = class_getClassMethod([UIFont class], @selector(replacement_fontWithName:size:traits:));
+        Method fontWithDescriptor_size_ = class_getClassMethod([UIFont class], @selector(fontWithDescriptor:size:));
+    
+#ifdef __IPHONE_7_0
+        Method replacementFontWithDescriptor_size_ = class_getClassMethod([UIFont class], @selector(replacement_fontWithDescriptor:size:));    
 	if (fontWithName_size_ && replacementFontWithName_size_ && strcmp(method_getTypeEncoding(fontWithName_size_), method_getTypeEncoding(replacementFontWithName_size_)) == 0)
 		method_exchangeImplementations(fontWithName_size_, replacementFontWithName_size_);
 	if (fontWithName_size_traits_ && replacementFontWithName_size_traits_ && strcmp(method_getTypeEncoding(fontWithName_size_traits_), method_getTypeEncoding(replacementFontWithName_size_traits_)) == 0)
 		method_exchangeImplementations(fontWithName_size_traits_, replacementFontWithName_size_traits_);
+	if (fontWithDescriptor_size_ && replacementFontWithDescriptor_size_ && strcmp(method_getTypeEncoding(fontWithDescriptor_size_), method_getTypeEncoding(replacementFontWithDescriptor_size_)) == 0)
+		method_exchangeImplementations(fontWithDescriptor_size_, replacementFontWithDescriptor_size_);
+#else
+    if (fontWithName_size_ && replacementFontWithName_size_ && strcmp(method_getTypeEncoding(fontWithName_size_), method_getTypeEncoding(replacementFontWithName_size_)) == 0)
+        method_exchangeImplementations(fontWithName_size_, replacementFontWithName_size_);
+    if (fontWithName_size_traits_ && replacementFontWithName_size_traits_ && strcmp(method_getTypeEncoding(fontWithName_size_traits_), method_getTypeEncoding(replacementFontWithName_size_traits_)) == 0)
+        method_exchangeImplementations(fontWithName_size_traits_, replacementFontWithName_size_traits_);
+#endif
+
+
 }
 
 + (UIFont *) replacement_fontWithName:(NSString *)fontName size:(CGFloat)fontSize
@@ -50,6 +63,18 @@ static void initializeReplacementFonts()
 	NSString *replacementFontName = [replacementDictionary objectForKey:fontName];
 	return [self replacement_fontWithName:replacementFontName ?: fontName size:fontSize traits:traits];
 }
+
+#ifdef __IPHONE_7_0
++ (UIFont *)replacement_fontWithDescriptor:(UIFontDescriptor *)descriptor size:(CGFloat)pointSize
+{
+    initializeReplacementFonts();
+    NSString *originalFontName = descriptor.fontAttributes[UIFontDescriptorNameAttribute];
+    NSString *replacementFontName = replacementDictionary[originalFontName];
+    UIFontDescriptor *replacementFontDescriptor = replacementFontName ? [UIFontDescriptor fontDescriptorWithName:replacementFontName size:pointSize] : descriptor;
+
+    return [self replacement_fontWithDescriptor:replacementFontDescriptor size:pointSize];
+}
+#endif
 
 + (NSDictionary *) replacementDictionary
 {
