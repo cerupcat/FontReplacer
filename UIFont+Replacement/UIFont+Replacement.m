@@ -27,10 +27,14 @@ static void initializeReplacementFonts()
 + (void) load
 {
 	Method fontWithName_size_ = class_getClassMethod([UIFont class], @selector(fontWithName:size:));
-	Method fontWithName_size_traits_ = class_getClassMethod([UIFont class], @selector(fontWithName:size:traits:));
+    
+    Method fontWithName_size_traits_ = class_getClassMethod([UIFont class], NSSelectorFromString(@"fontWithName:size:traits:"));
+    
 	Method replacementFontWithName_size_ = class_getClassMethod([UIFont class], @selector(replacement_fontWithName:size:));
-		Method replacementFontWithName_size_traits_ = class_getClassMethod([UIFont class], @selector(replacement_fontWithName:size:traits:));
-        Method fontWithDescriptor_size_ = class_getClassMethod([UIFont class], @selector(fontWithDescriptor:size:));
+    
+    Method replacementFontWithName_size_traits_ = class_getClassMethod([UIFont class], @selector(replacement_fontWithName:size:traits:));
+    
+    Method fontWithDescriptor_size_ = class_getClassMethod([UIFont class], @selector(fontWithDescriptor:size:));
     
 #ifdef __IPHONE_7_0
         Method replacementFontWithDescriptor_size_ = class_getClassMethod([UIFont class], @selector(replacement_fontWithDescriptor:size:));    
